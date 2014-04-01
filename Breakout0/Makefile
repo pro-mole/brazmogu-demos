@@ -17,7 +17,7 @@ clean:
 
 #Releases
 release: $(PACKNAME)
-	cp -t ../release $(PACKNAME) Makefile
+	cp $(PACKNAME) Makefile ../release
 	$(MAKE) -C ../release release-dir
 	mkdir -p release
 	cp -rf ../release/release ./
@@ -43,7 +43,7 @@ release-dir: love-win32.zip love-win64.zip love-macosx.zip
 	unzip love-macosx.zip
 	make -C love.app --makefile ../Makefile release-macosx
 	mv love.app $(EXECNAME).app
-	zip -m -9 release/$(EXECNAME)-$(VERSION)-macosx.zip $(EXECNAME).app
+	zip -m -r -9 release/$(EXECNAME)-$(VERSION)-macosx.zip $(EXECNAME).app
 	rm -rf $(EXECNAME).app
 	#Linux Release
 	zip -m -9 release/$(EXECNAME)-$(VERSION)-linux.zip $(PACKNAME)
