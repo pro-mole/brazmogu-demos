@@ -1,6 +1,6 @@
 -- Let's define the Paddle object here
 
-Paddle = { size = 100, speed = 100, x = 0, y = 0 }
+Paddle = { size = 100, speed = 150, x = 0, y = 0 }
 
 function Paddle:draw()
 	love.graphics.rectangle("fill", self.x, self.y, self.size, 8)

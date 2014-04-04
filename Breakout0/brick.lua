@@ -19,24 +19,34 @@ end
 
 function Bricks:update()
 	for i,B in ipairs(self.bricks) do
-		if (Ball.x >= B.x - Ball.size) and (Ball.x <= B.x + B.height) and (Ball.y >= B.y - Ball.size) and (Ball.y <= B.y + B.height) then
-			if Ball.vdir > 0 and Ball.y <= B.y then
-				Ball.vdir = -Ball.vdir
-				self:removeBrick(i, 100)
-				break
-			elseif Ball.vdir < 0 and Ball.y >= B.y + B.height - Ball.size then
-				Ball.vdir = -Ball.vdir
-				self:removeBrick(i, 100)
-				break
-			elseif Ball.hdir > 0 and Ball.x <= B.x then
-				Ball.hdir = -Ball.hdir
-				self:removeBrick(i, 100)
-				break
-			elseif Ball.hdir > 0 and Ball.x >= B.x + B.width - Ball.size then
-				Ball.hdir = -Ball.hdir
-				self:removeBrick(i, 100)
-				break
-			end
+		local collision = false
+		-- Collision from below
+		if (Ball.x >= B.x - Ball.size*2) and (Ball.x <= B.x + B.width) and
+			(Ball.y >= B.y + B.height - Ball.size*2) and (Ball.y <= B.y + B.height) then
+			Ball.vdir = -Ball.vdir
+			collision = true
+		end
+		-- Collision from above
+		if (Ball.x >= B.x - Ball.size*2) and (Ball.x <= B.x + B.width) and
+			(Ball.y >= B.y - Ball.size*2) and (Ball.y <= B.y) then
+			Ball.vdir = -Ball.vdir
+			collision = true
+		end
+		-- Collision from the left
+		if (Ball.x >= B.x - Ball.size*2) and (Ball.x <= B.x) and
+			(Ball.y >= B.y - Ball.size*2) and (Ball.y <= B.y + B.height) then
+			Ball.hdir = -Ball.hdir
+			collision = true
+		end
+		-- Collision from the right
+		if (Ball.x >= B.x + B.width - Ball.size*2) and (Ball.x <= B.x + B.width) and
+			(Ball.y >= B.y - Ball.size*2) and (Ball.y <= B.y + B.height) then
+			Ball.hdir = -Ball.hdir
+			collision = true
+		end
+
+		if collision then
+			self:removeBrick(i, 100)
 		end
 	end
 end
