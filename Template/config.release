@@ -1,0 +1,9 @@
+# Configuration file for releases
+
+# WIN
+
+# MAC OS
+bundleIdentifier="com.brazmgu.example"
+bundleName="LÖVE Bundle Example"
+
+# LINUX
