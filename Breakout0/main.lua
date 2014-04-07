@@ -43,6 +43,7 @@ function love.draw()
 
 	if endgame then
 		love.graphics.printf("GAME OVER", love.window.getWidth()/2 - 100, love.window.getHeight()/2, 200, "center")
+		love.graphics.printf("(PRESS 'R' TO TRY AGAIN)", love.window.getWidth()/2 - 200, love.window.getHeight()/2 + 16, 400, "center")
 	end
 
 	if love.keyboard.isDown("r") and endgame then
