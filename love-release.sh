@@ -82,7 +82,7 @@ make -C $(dirname $lovefile)
 
 if [ ! -e $lovefile ]
 then
-	echo "ERROR: $lovefile no found"
+	echo "ERROR: $lovefile not found"
 	exit 1
 fi
 
@@ -117,11 +117,16 @@ function macosx {
 	then
 		mkdir tmp
 		cp $lovefile tmp/
+		if [ -e $(dirname $lovefile)/Love.icns ]
+		then 
+			cp $(dirname $lovefile)/Love.icns tmp/
+		fi
 		cd tmp
 		unzip -q ../release/macosx/love-macosx.zip
 		appname=$zipname.app
 		mv love.app $appname
 		mv $(basename $lovefile) $appname/Contents/Resources/
+		if [ -e Love.icns ]; then mv Love.icns $appname/Contents/Resources/; fi
 		#echo $bundleName $bundleIdentifier
 		sed -i '' 's/#bundleName/$bundleName/; s/#bundleIdentifier/$bundleIdentifier/;' $appname/Contents/Info.plist
 		chmod -R a+x $appname
