@@ -42,6 +42,7 @@ function Bricks:update()
 		end
 
 		if collision.h or collision.v then
+			love.audio.play(sound.tick)
 			self:removeBrick(i, 100)
 			if collision.v then Ball.vdir = -Ball.vdir end
 			if collision.h then Ball.hdir = -Ball.hdir end

@@ -4,8 +4,12 @@ require("ball")
 
 print(elements)
 
+sound = {}
+
 function love.load()
 	-- Load data
+	sound = {bump=love.audio.newSource("assets/sound/bump_hollow.wav","static") , tick=love.audio.newSource("assets/sound/bump_tinkle.wav","static")}
+
 	score = 0
 	endgame = false
 	

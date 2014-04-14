@@ -13,12 +13,14 @@ function Ball:update(dt)
 
 	-- Bounce
 	if self.y <= 0 then
+		love.audio.play(sound.bump)
 		self.vdir = -self.vdir
 		self.y = 0
 	end
 
 	-- Paddle Bounce
 	if self.y >= (Paddle.y - self.size*2) and self.y <= Paddle.y and (self.x >= Paddle.x and self.x <= Paddle.x + Paddle.size - self.size) then
+		love.audio.play(sound.bump)
 		self.vdir = -self.vdir
 		-- Horizontal speed variance
 		local delta = (self.x + self.size) - (Paddle.x + Paddle.size/2)
@@ -27,6 +29,7 @@ function Ball:update(dt)
 	end
 
 	if self.x <= 0 or self.x >= (love.window.getWidth() - self.size*2) then
+		love.audio.play(sound.bump)
 		self.hdir = -self.hdir
 		if self.x < 0 then self.x = 0 end
 		if self.x > (love.window.getWidth() - self.size*2) then self.x = (love.window.getWidth() - self.size*2) end
