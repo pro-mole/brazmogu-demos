@@ -1,0 +1,11 @@
+# Configuration file for releases
+
+# WIN
+icoName="pong.ico"
+
+# MAC OS
+bundleIdentifier="com.brazmgu.example"
+bundleName="LÖVE Bundle Example"
+icnsName="pong.icns"
+
+# LINUX
