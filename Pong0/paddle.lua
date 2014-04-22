@@ -1,6 +1,6 @@
 -- Pong Paddles
 
-Paddle={speed=100, size=50, thick=4}
+Paddle={speed=100, size=100, thick=6}
 Paddle.__index = Paddle
 
 function Paddle.new (x,y,player)
@@ -10,13 +10,13 @@ function Paddle.new (x,y,player)
 end
 
 function Paddle:update(dt)
-	if love.keyboard.isdown(settings.controls[self.player]['up']) then
+	if love.keyboard.isDown(settings.controls[self.player]['up']) then
 		if self.y > self.size/2 then
 			self.y = self.y - 100*dt
 		end
 	end
 	
-	if love.keyboard.isdown(settings.controls[self.player]['down']) then
+	if love.keyboard.isDown(settings.controls[self.player]['down']) then
 		if self.y < (love.window.getHeight() - self.size/2) then
 			self.y = self.y + 100*dt
 		end
@@ -26,6 +26,9 @@ end
 function Paddle:draw()
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.rectangle("fill", self.x - self.thick/2, self.y - self.size/2, self.thick, self.size)
+
+	-- love.graphics.print(settings.controls[self.player]['up'], self.x, self.y - self.size/2 - 8)
+	-- love.graphics.print(settings.controls[self.player]['down'], self.x, self.y + self.size/2)
 end
 
 function Paddle:keypressed(key,isrepeat)
@@ -40,7 +43,7 @@ function Paddle:keypressed(key,isrepeat)
 			else
 				ball.direction = 45
 			end
-		else if key == settings.controls[self.player]['down'] then
+		elseif key == settings.controls[self.player]['down'] then
 			ball.speed = 100
 			if ball.x < self.x then -- Ball to the left
 				ball.direction = 225
