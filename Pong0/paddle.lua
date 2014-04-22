@@ -3,8 +3,8 @@
 Paddle={speed=100, size=100, thick=6}
 Paddle.__index = Paddle
 
-function Paddle.new (x,y,player)
-	_P = {x=x, y=y or love.window.getHeight()/2, player=player}
+function Paddle.new (x,y,player,side)
+	_P = {x=x, y=y or love.window.getHeight()/2, player=player, side=side or "left"}
 
 	return setmetatable(_P, Paddle)
 end

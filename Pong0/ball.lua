@@ -10,9 +10,9 @@ function Ball.new(x, y, player)
 end
 
 function Ball:update(dt)
-	-- Ball is waiting to be shot
 	local vx, vy = math.cos(math.rad(self.direction)), -math.sin(math.rad(self.direction))
 
+	-- Ball is waiting to be shot
 	if speed == 0 then
 		self.y = paddles[self.player].y
 	else

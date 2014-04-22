@@ -10,19 +10,19 @@ ball = {}
 settings = {controls = {
 	P1 = {
 		up='w',
-		down='s'
+		down='s',
 		},
 	P2 = {
 		up='up',
-		down='down'
+		down='down',
 		}
 	}}
 
 function love.load()
 	score.P1 = 0
 	score.P2 = 0
-	paddles.P1 = Paddle.new(64, love.window.getHeight()/2, "P1")
-	paddles.P2 = Paddle.new(love.window.getWidth()-64, love.window.getHeight()/2, "P2")
+	paddles.P1 = Paddle.new(64, love.window.getHeight()/2, "P1", "left")
+	paddles.P2 = Paddle.new(love.window.getWidth()-64, love.window.getHeight()/2, "P2", "right")
 	-- settings:load()
 
 	sound['hollow'] = love.audio.newSource("assets/sound/bump_hollow.wav")
@@ -67,6 +67,13 @@ function love.draw()
 	love.graphics.printf(score.P1, 8, center_y - font.huge:getHeight()/2, score_w, "center")
 	love.graphics.printf(score.P2, love.window.getWidth() - score_w - 8, center_y - font.huge:getHeight()/2, score_w, "center")
 
+	if ball.speed == 0 then
+		local instructions_w = font.big:getWidth("Move UP or DOWN")
+		love.graphics.setFont(font.big)
+		
+		love.graphics.printf(ball.player..": Move UP or DOWN to throw the ball", paddles[ball.player]['x'], 4, instructions_w, paddles[ball.player]['side'])
+	end
+	
 	-- Draw paddles
 	for i,P in pairs(paddles) do
 		P:draw()
