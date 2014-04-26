@@ -78,6 +78,7 @@ else
 	lovedir=$(dirname $lovefile)
 fi
 
+./iconmake.sh $lovedir
 releasedir=$lovedir/release
 . $lovedir/config.release
 make -C $lovedir
