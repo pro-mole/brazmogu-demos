@@ -4,7 +4,7 @@
 icoName="game.ico"
 
 # MAC OS
-bundleIdentifier="com.brazmgu.example"
+bundleIdentifier="com.brazmogu.example"
 bundleName="LÖVE Bundle Example"
 icnsName="game.icns"
 
