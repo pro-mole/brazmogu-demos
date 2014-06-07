@@ -1,0 +1,11 @@
+# Configuration file for releases
+
+# WIN
+icoName="tetris.ico"
+
+# MAC OS
+bundleIdentifier="com.brazmgu.tetris"
+bundleName="Brazmogu Tetris Demo"
+icnsName="tetris.icns"
+
+# LINUX
