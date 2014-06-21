@@ -60,14 +60,14 @@ end
 function Grid:keypressed(k, isrepeat)
 	if not self.active then return end
 	
-	local turn = nil
 	if k == "up" then
-		turn = turnCW
-	end
-	
-	if turn ~= nil then
 		for i,t in ipairs(self.active.blocks) do
-			self.active.blocks[i] = turn(t.x, t.y)
+			self.active.blocks[i] = turnCW(t.x, t.y)
+		end
+		if not self:checkActiveBlock() then
+			for i,t in ipairs(self.active.blocks) do
+				self.active.blocks[i] = turnCCW(t.x, t.y)
+			end
 		end
 	end
 	
@@ -172,7 +172,7 @@ function Grid:draw()
 	love.graphics.line(0, self.height * self.tile_size, self.width * self.tile_size, self.height * self.tile_size)
 	
 	-- Draw the "fixed" blocks
-	love.graphics.translate(-8, -8)
+	love.graphics.translate(-self.tile_size, -self.tile_size)
 	for i,B in ipairs(self.blocks) do
 		love.graphics.setColor(255,255,255,255)
 		love.graphics.rectangle("fill", B.x * self.tile_size, B.y * self.tile_size, self.tile_size, self.tile_size)
