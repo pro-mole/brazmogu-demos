@@ -11,6 +11,9 @@ Grid = {
 	timer = 0
 }
 
+score = 0
+endgame = false
+
 -- An easier way to deal with this tedious pattern creation
 function tetromino(...)
 	print(...)
@@ -53,6 +56,9 @@ function Grid.new(w, h, s)
 	Grid.timer = 0
 	
 	Grid.x, Grid.y = (love.window.getWidth() - Grid.width * Grid.tile_size)/2, (love.window.getHeight() - Grid.height * Grid.tile_size)/2
+
+	score = 0
+	endgame = false
 	
 	return Grid
 end
@@ -60,56 +66,67 @@ end
 function Grid:keypressed(k, isrepeat)
 	if not self.active then return end
 	
-	if k == "up" then
-		for i,t in ipairs(self.active.blocks) do
-			self.active.blocks[i] = turnCW(t.x, t.y)
+	if endgame then
+		if k == "r" then
+			Grid.new(self.width, self.height, self.tile_size)
 		end
-		if not self:checkActiveBlock() then
+	else
+		if k == "up" then
 			for i,t in ipairs(self.active.blocks) do
-				self.active.blocks[i] = turnCCW(t.x, t.y)
+				self.active.blocks[i] = turnCW(t.x, t.y)
+			end
+			if not self:checkActiveBlock() then
+				for i,t in ipairs(self.active.blocks) do
+					self.active.blocks[i] = turnCCW(t.x, t.y)
+				end
 			end
 		end
-	end
-	
-	if k == "left" then
-		self.active.x = self.active.x - 1
-		if not self:checkActiveBlock() then
-			self.active.x = self.active.x + 1
-		end
-	elseif k == "right" then
-		self.active.x = self.active.x + 1
-		if not self:checkActiveBlock() then
+		
+		if k == "left" then
 			self.active.x = self.active.x - 1
+			if not self:checkActiveBlock() then
+				self.active.x = self.active.x + 1
+			end
+		elseif k == "right" then
+			self.active.x = self.active.x + 1
+			if not self:checkActiveBlock() then
+				self.active.x = self.active.x - 1
+			end
+		elseif k == "down" then
+			while Grid:checkActiveBlock() do
+				self.active.y = self.active.y + 1
+			end
+			self.active.y = self.active.y - 1
 		end
-	elseif k == "down" then
-		while Grid:checkActiveBlock() do
-			self.active.y = self.active.y + 1
-		end
-		self.active.y = self.active.y - 1
 	end
 end
 
 function Grid:update(dt)
-	local interval = 1/self.speed
-	self.timer = self.timer + dt
-	if self.timer >= interval then
-		self.timer = self.timer - interval
-		if self.active then
-			-- Check if active block can move
-			self.active.y = self.active.y + 1
-			if not self:checkActiveBlock() then
-				self.active.y = self.active.y - 1
-				for i,b in ipairs(self.active.blocks) do
-					table.insert(self.blocks, Block.new(self.active.x + b.x, self.active.y + b.y))
+	if not endgame then
+		local interval = 1/self.speed
+		self.timer = self.timer + dt
+		if self.timer >= interval then
+			self.timer = self.timer - interval
+			if self.active then
+				-- Check if active block can move
+				self.active.y = self.active.y + 1
+				if not self:checkActiveBlock() then
+					self.active.y = self.active.y - 1
+					for i,b in ipairs(self.active.blocks) do
+						table.insert(self.blocks, Block.new(self.active.x + b.x, self.active.y + b.y))
+					end
+					self.active = nil
+					self:checkLine()
+					self.timer = interval
 				end
-				self.active = nil
-				self:checkLine()
-				self.timer = interval
+			else
+				-- Create new tetromino
+				self.active = {x = math.floor(self.width/2), y = 1}
+				self.active["blocks"] = Tetras[math.random(#Tetras)]
+				if not self:checkActiveBlock() then -- if the block can't move when it is created, then we have a problem
+					endgame = true
+				end
 			end
-		else
-			-- Create new tetromino
-			self.active = {x = math.floor(self.width/2), y = 1}
-			self.active["blocks"] = Tetras[math.random(#Tetras)]
 		end
 	end
 end
@@ -150,31 +167,28 @@ function Grid:checkLine()
 		end
 		
 		if line then
-			for j = 1,self.width do
-				self:getBlock(j,i):remove()
-				for k = 1,i-1 do
-					local B = self:getBlock(j,k)
-					if B then B.y = B.y + 1 end
+			for j = #self.blocks,1,-1 do
+				local B = self.blocks[j]
+				if B.y == i then
+					B:remove()
+				elseif B.y < i then
+					B.y = B.y + 1
 				end
 			end
-			self.speed = self.speed + 1
+			self.speed = self.speed + 0.1
+			score = score + 100
 		end
 	end
 end
 
 function Grid:draw()
 	love.graphics.push()
-	
 	love.graphics.translate(self.x, self.y)
-	love.graphics.setColor(255,255,255,255)
-	love.graphics.line(0, 0, 0, self.height * self.tile_size)
-	love.graphics.line(self.width * self.tile_size, 0, self.width * self.tile_size, self.height * self.tile_size)
-	love.graphics.line(0, self.height * self.tile_size, self.width * self.tile_size, self.height * self.tile_size)
 	
 	-- Draw the "fixed" blocks
 	love.graphics.translate(-self.tile_size, -self.tile_size)
 	for i,B in ipairs(self.blocks) do
-		love.graphics.setColor(255,255,255,255)
+		love.graphics.setColor(128,128,128,255)
 		love.graphics.rectangle("fill", B.x * self.tile_size, B.y * self.tile_size, self.tile_size, self.tile_size)
 		love.graphics.setColor(0,0,0,255)
 		love.graphics.rectangle("line", B.x * self.tile_size, B.y * self.tile_size, self.tile_size, self.tile_size)
@@ -189,6 +203,30 @@ function Grid:draw()
 			love.graphics.rectangle("line", (self.active.x + B.x)* self.tile_size, (self.active.y + B.y) * self.tile_size, self.tile_size, self.tile_size)
 		end
 	end
-	
+
+	love.graphics.pop()
+
+	love.graphics.push()
+	love.graphics.translate(self.x, self.y)
+
+	love.graphics.setColor(255,255,255,255)
+	love.graphics.line(-1, -1, -1, self.height * self.tile_size + 1)
+	love.graphics.line(self.width * self.tile_size + 1, -1, self.width * self.tile_size + 1, self.height * self.tile_size + 1)
+	love.graphics.line(-1, self.height * self.tile_size + 1, self.width * self.tile_size + 1, self.height * self.tile_size + 1)
+
+	love.graphics.print(string.format("%08d", score), 0, self.height * self.tile_size + 2)
+
+	if endgame then
+		love.graphics.origin()
+		love.graphics.setColor(0,0,0,128)
+		love.graphics.rectangle("fill", 0, 0, love.window.getWidth(), love.window.getHeight())
+
+		local font = love.graphics.getFont()
+		love.graphics.setColor(0,0,0,192)
+		love.graphics.rectangle("fill", 0, love.window.getHeight()/2 - font:getHeight(), love.window.getWidth(), font:getHeight() * 2)
+		love.graphics.setColor(255,255,255,255)
+		love.graphics.printf("GAME OVER\n(Press 'R' to restart)", 0, love.window.getHeight()/2 - font:getHeight(), love.window.getWidth(), "center")
+	end
+
 	love.graphics.pop()
 end

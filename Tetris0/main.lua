@@ -10,6 +10,10 @@ function love.update(dt)
 end
 
 function love.keypressed(k, isrepeat)
+	if k == "escape" then
+		love.event.quit()
+	end
+
 	Grid:keypressed(k, false)
 end
 
