@@ -4,8 +4,8 @@
 icoName="pong.ico"
 
 # MAC OS
-bundleIdentifier="com.brazmogu.pong"
-bundleName="BrazMogu Pong"
+bundleIdentifier="com.brazmogu.demo.pong"
+bundleName="BrazMogu Pong Demo"
 icnsName="pong.icns"
 
 # LINUX

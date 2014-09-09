@@ -4,7 +4,7 @@
 icoName="tetris.ico"
 
 # MAC OS
-bundleIdentifier="com.brazmgu.tetris"
+bundleIdentifier="com.brazmgu.demo.tetris"
 bundleName="Brazmogu Tetris Demo"
 icnsName="tetris.icns"
 
