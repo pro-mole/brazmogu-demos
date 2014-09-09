@@ -1,0 +1,11 @@
+# Configuration file for releases
+
+# WIN
+icoName="bejeweled.ico"
+
+# MAC OS
+bundleIdentifier="com.brazmogu.demo.bejeweled"
+bundleName="BrazMogu Bejeweled Demo"
+icnsName="bejeweled.icns"
+
+# LINUX
