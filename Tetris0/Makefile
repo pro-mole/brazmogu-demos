@@ -1,7 +1,7 @@
 #A simple Makefile to create our package
 
 EXECNAME=Tetris0
-VERSION=0.3
+VERSION=0.5
 PACKNAME=$(EXECNAME)-$(VERSION).love
 
 all: $(PACKNAME)
