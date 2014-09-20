@@ -11,16 +11,24 @@ require("grid")
 _grid = nil
 
 function love.load()
-	_grid = Grid.new()
+	repeat
+		_grid = Grid.new()
 
-	local line = ""
-	for pos,T in _grid:iterate() do
-		if pos[1] == 1 then
-			print(line)
-			line = ""
+		local line = ""
+		for pos,T in _grid:iterate() do
+			if pos[1] == 1 then
+				print(line)
+				line = ""
+			end
+			line = line..T.value
 		end
-		line = line..T
-	end
+
+		local m = _grid:checkMatch()
+		local size = 0
+		for T,v in pairs(m) do
+			size = size + 1
+		end
+	until size == 0
 end
 
 function love.update(dt)

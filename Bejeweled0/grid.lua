@@ -1,8 +1,24 @@
 -- The Game Grid
 
--- Tile enumerator
--- 0 means an empty tile
+-- Tile class 
 Tile = {
+
+}
+Tile.__index = Tile
+
+function Tile.new(x,y,T)
+	if not T or T > #TileTypes or T < 0 then
+		T = math.random(#TileTypes)
+	end
+
+	return setmetatable({x=x, y=y, value=T}, Tile)
+end
+
+function Tile.__eq(T1, T2)
+	return T1.value == T2.value
+end
+
+TileTypes = {
 	"FIRE",
 	"EARTH",
 	"WATER",
@@ -36,7 +52,7 @@ function Grid.new(w,h)
 		G.tiles[y] = {}
 		local row = G.tiles[y]
 		for x = 1,G.w do
-			row[x] = math.random(#Tile)
+			row[x] = Tile.new(x,y)
 		end
 	end
 
@@ -47,12 +63,18 @@ function Grid.new(w,h)
 end
 
 function Grid:draw()
+	local matches = self:checkMatch()
 	local offsetx = (love.window.getWidth() - Settings.tile_size*self.w)/2
 	local offsety = (love.window.getHeight() - Settings.tile_size*self.h)/2
 	for pos,T in self:iterate() do
-		love.graphics.setColor(unpack(Colors[T]))
+		love.graphics.setColor(unpack(Colors[T.value]))
 
 		love.graphics.rectangle("fill", offsetx + (pos[1]-1)*Settings.tile_size, offsety + (pos[2]-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+		if matches[T] then
+			love.graphics.setColor(255,255,255,128)
+
+			love.graphics.rectangle("fill", offsetx + (pos[1]-1)*Settings.tile_size, offsety + (pos[2]-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+		end
 	end
 
 	love.graphics.setColor(0,0,0,255)
@@ -72,6 +94,35 @@ end
 -- Check for matches in the grid
 -- Return a table containing the tiles that are matching with anything
 function Grid:checkMatch()
+	local matches = {}
+	for pos,T in self:iterate() do
+		local x,y = unpack(pos)
+		local dx,dy = 0,0
+		while self:getTile(x+dx+1,y) == T do
+			dx = dx + 1
+		end
+		while self:getTile(x,y+dy+1) == T do
+			dy = dy + 1
+		end
+		if dx >= Settings.match_size - 1 then
+			for i=0,dx do
+				matches[self:getTile(x+i,y)] = true
+			end
+		end
+		if dy >= Settings.match_size - 1 then
+			for i=0,dy do
+				matches[self:getTile(x,y+i)] = true
+			end
+		end
+	end
+
+	return matches
+	--[[local M = {}
+	for i,v in pairs(matches) do
+		if v then table.insert(M,i) end
+	end
+
+	return M]]
 end
 
 -- Apply changes to table
