@@ -32,9 +32,29 @@ function love.load()
 end
 
 function love.update(dt)
+
 end
 
-function love.mousepressed(m,x,y)
+function love.mousepressed(x,y,button)
+	if button == "l" then
+		local _x, _y = math.ceil((x - _grid.offx)/Settings.tile_size), math.ceil((y - _grid.offy)/Settings.tile_size)
+		local T = _grid:getTile(_x, _y)
+		if T then
+			if _grid.selected then
+				local S = _grid.selected
+				if S == T then
+					_grid.selected = nil
+				elseif (T.x == S.x and math.abs(T.y - S.y) == 1) or (T.y == S.y and math.abs(T.x - S.x)) then
+					_grid:swap(S,T)
+					_grid.selected = nil
+				else
+					_grid.selected = T
+				end
+			else
+				_grid.selected = T
+			end
+		end
+	end
 end
 
 function love.draw()

@@ -14,10 +14,6 @@ function Tile.new(x,y,T)
 	return setmetatable({x=x, y=y, value=T}, Tile)
 end
 
-function Tile.__eq(T1, T2)
-	return T1.value == T2.value
-end
-
 TileTypes = {
 	"FIRE",
 	"EARTH",
@@ -46,6 +42,10 @@ function Grid.new(w,h)
 		h = h or Settings.grid_height,
 		tiles = {}
 	}
+	G.offx = (love.window.getWidth() - Settings.tile_size*G.w)/2
+	G.offy = (love.window.getHeight() - Settings.tile_size*G.h)/2
+	G.width = Settings.tile_size*G.w
+	G.height = Settings.tile_size*G.h
 	setmetatable(G, Grid)
 
 	for y = 1,G.h do
@@ -64,18 +64,26 @@ end
 
 function Grid:draw()
 	local matches = self:checkMatch()
-	local offsetx = (love.window.getWidth() - Settings.tile_size*self.w)/2
-	local offsety = (love.window.getHeight() - Settings.tile_size*self.h)/2
+
+	love.graphics.push()
+	love.graphics.translate(self.offx, self.offy)
 	for pos,T in self:iterate() do
+		local x,y = unpack(pos)
 		love.graphics.setColor(unpack(Colors[T.value]))
 
-		love.graphics.rectangle("fill", offsetx + (pos[1]-1)*Settings.tile_size, offsety + (pos[2]-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+		love.graphics.rectangle("fill", (x-1)*Settings.tile_size, (y-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+		if self.selected and self.selected == T then
+			love.graphics.setColor(255,255,255,128)
+
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4, (y-1)*Settings.tile_size + 4, Settings.tile_size - 8, Settings.tile_size - 8)
+		end
 		if matches[T] then
 			love.graphics.setColor(255,255,255,128)
 
-			love.graphics.rectangle("fill", offsetx + (pos[1]-1)*Settings.tile_size, offsety + (pos[2]-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size, (y-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
 		end
 	end
+	love.graphics.pop()
 
 	love.graphics.setColor(0,0,0,255)
 end
@@ -88,7 +96,13 @@ function Grid:getTile(x,y)
 	end
 end
 
-function Grid:setTile(x,y,T)
+function Grid:swap(T1,T2)
+	print(T1,T2)
+	print(T1.x,T1.y)
+	print(T2.x,T2.y)
+	self.tiles[T1.y][T1.x] = T2
+	self.tiles[T2.y][T2.x] = T1
+	T1.x, T1.y, T2.x, T2.y = T2.x, T2.y, T1.x, T1.y
 end
 
 -- Check for matches in the grid
@@ -98,10 +112,10 @@ function Grid:checkMatch()
 	for pos,T in self:iterate() do
 		local x,y = unpack(pos)
 		local dx,dy = 0,0
-		while self:getTile(x+dx+1,y) == T do
+		while self:getTile(x+dx+1,y) and self:getTile(x+dx+1,y).value == T.value do
 			dx = dx + 1
 		end
-		while self:getTile(x,y+dy+1) == T do
+		while self:getTile(x,y+dy+1) and self:getTile(x,y+dy+1).value == T.value do
 			dy = dy + 1
 		end
 		if dx >= Settings.match_size - 1 then
