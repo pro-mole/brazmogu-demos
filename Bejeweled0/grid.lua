@@ -77,7 +77,7 @@ function Grid:draw()
 
 			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4, (y-1)*Settings.tile_size + 4, Settings.tile_size - 8, Settings.tile_size - 8)
 		end
-		if matches[T] then
+		if matches[T] and T.value ~= 0 then
 			love.graphics.setColor(255,255,255,128)
 
 			love.graphics.rectangle("fill", (x-1)*Settings.tile_size, (y-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
@@ -142,10 +142,31 @@ end
 -- Apply changes to table
 -- Used to actually remove the tiles marked for removal by the match function
 function Grid:resolve()
+	local change = false
+	local matches = self:checkMatch()
+	for T in pairs(matches) do
+		T.value = 0
+		change = true
+	end
+
+	return change
 end
 
 -- Organize grid, pushing down the empty tiles, if any
 function Grid:organize()
+	for x = 1,self.w do
+		for y = self.h,1,-1 do
+			T = self:getTile(x,y)
+			if T.value == 0 then
+				print(string.format("Empty at %d,%d", x, y))
+				for _y = y-1,1,-1 do
+					print(string.format("Slide %d down", _y))
+					self:swap(T, self:getTile(x,_y))
+				end
+				T.value = math.random(#TileTypes)
+			end
+		end
+	end
 end
 
 -- Iterator function for the grid

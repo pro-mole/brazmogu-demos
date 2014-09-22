@@ -46,6 +46,15 @@ function love.mousepressed(x,y,button)
 					_grid.selected = nil
 				elseif (T.x == S.x and math.abs(T.y - S.y) == 1) or (T.y == S.y and math.abs(T.x - S.x)) then
 					_grid:swap(S,T)
+					if _grid:resolve() then
+						love.timer.sleep(0.2)
+						repeat
+							_grid:organize()
+							love.timer.sleep(0.2)
+						until not _grid:resolve()
+					else
+						_grid:swap(S,T)
+					end
 					_grid.selected = nil
 				else
 					_grid.selected = T
