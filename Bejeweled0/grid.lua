@@ -75,16 +75,16 @@ function Grid:draw()
 		local offx, offy = T.offx or 0, T.offy or 0
 		love.graphics.setColor(unpack(Colors[T.value]))
 
-		love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx, (y-1)*Settings.tile_size + offy, Settings.tile_size, Settings.tile_size)
+		love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx*Settings.tile_size, (y-1)*Settings.tile_size + offy*Settings.tile_size, Settings.tile_size, Settings.tile_size)
 		if self.selected and self.selected == T then
 			love.graphics.setColor(255,255,255,128)
 			
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4 + offx, (y-1)*Settings.tile_size + 4 + offy, Settings.tile_size - 8, Settings.tile_size - 8)
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4 + offx*Settings.tile_size, (y-1)*Settings.tile_size + 4 + offy*Settings.tile_size, Settings.tile_size - 8, Settings.tile_size - 8)
 		end
 		if matches[T] and T.value ~= 0 then
 			love.graphics.setColor(255,255,255,128)
 
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx, (y-1)*Settings.tile_size + offy, Settings.tile_size, Settings.tile_size)
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx*Settings.tile_size, (y-1)*Settings.tile_size + offy*Settings.tile_size, Settings.tile_size, Settings.tile_size)
 		end
 	end
 	love.graphics.pop()
