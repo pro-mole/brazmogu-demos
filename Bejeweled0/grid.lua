@@ -62,6 +62,9 @@ function Grid.new(w,h)
 	return G
 end
 
+function Grid:update(dt)
+end
+
 function Grid:draw()
 	local matches = self:checkMatch()
 
@@ -69,18 +72,19 @@ function Grid:draw()
 	love.graphics.translate(self.offx, self.offy)
 	for pos,T in self:iterate() do
 		local x,y = unpack(pos)
+		local offx, offy = T.offx or 0, T.offy or 0
 		love.graphics.setColor(unpack(Colors[T.value]))
 
-		love.graphics.rectangle("fill", (x-1)*Settings.tile_size, (y-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+		love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx, (y-1)*Settings.tile_size + offy, Settings.tile_size, Settings.tile_size)
 		if self.selected and self.selected == T then
 			love.graphics.setColor(255,255,255,128)
-
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4, (y-1)*Settings.tile_size + 4, Settings.tile_size - 8, Settings.tile_size - 8)
+			
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4 + offx, (y-1)*Settings.tile_size + 4 + offy, Settings.tile_size - 8, Settings.tile_size - 8)
 		end
 		if matches[T] and T.value ~= 0 then
 			love.graphics.setColor(255,255,255,128)
 
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size, (y-1)*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx, (y-1)*Settings.tile_size + offy, Settings.tile_size, Settings.tile_size)
 		end
 	end
 	love.graphics.pop()
@@ -155,7 +159,7 @@ end
 -- Organize grid, pushing down the empty tiles, if any
 function Grid:organize()
 	for x = 1,self.w do
-		for y = self.h,1,-1 do
+		for y = 1,self.h do
 			T = self:getTile(x,y)
 			if T.value == 0 then
 				print(string.format("Empty at %d,%d", x, y))
@@ -163,8 +167,13 @@ function Grid:organize()
 					print(string.format("Slide %d down", _y))
 					self:swap(T, self:getTile(x,_y))
 				end
-				T.value = math.random(#TileTypes)
 			end
+		end
+	end
+	
+	for pos,T in self:iterate() do
+		if T.value == 0 then
+			T.value = math.random(#TileTypes)
 		end
 	end
 end
