@@ -38,6 +38,14 @@ function love.update(dt)
 	_grid:update(dt)
 end
 
+function love.keypressed(key, isrepeat)
+	if StateMachine.state == "IDLE" then
+		if key == "escape" then
+			love.quit()
+		end
+	end
+end
+
 function love.mousepressed(x,y,button)
 	if button == "l" and StateMachine.state == "IDLE" then
 		local _x, _y = math.ceil((x - _grid.offx)/Settings.tile_size), math.ceil((y - _grid.offy)/Settings.tile_size)

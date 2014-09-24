@@ -55,7 +55,7 @@ function StateMachine:update(dt)
 						T2[off] = nil
 						e[1] = "done";
 					end
-				elseif e[1] == "slide" then
+				elseif e[1] == "fall" then
 					local _slide,Tlist,timer = unpack(e)
 					timer = timer or 0
 					offset = Tlist[1].offy or 0
@@ -67,10 +67,33 @@ function StateMachine:update(dt)
 						e[3] = timer
 					else
 						-- Assuming tiles in the list will be in order from lower to higher
+						local last = nil
 						for i,T in ipairs(Tlist) do
-							_grid:swap(T, grid:getTile(T.x, T.y+1))
+							_grid:swap(T, _grid:getTile(T.x, T.y+1))
 							T.offy = nil
 						end
+						e[1] = "done"
+					end
+				elseif e[1] == "shrink" then
+					local _shrink,T = unpack(e)
+					local scale = T.scale or 1
+					if speed > 0 then scale = scale - dt/speed else scale = 0 end
+					if scale > 0 then
+						T.scale = scale
+					else
+						T.value = 0
+						T.scale = nil
+						e[1] = "done"
+					end
+				elseif e[1] == "spawn" then
+					local _spawn,T,val = unpack(e)
+					T.value = val
+					local scale = T.scale or 0
+					if speed > 0 then scale = scale + dt/speed else scale = 1 end
+					if scale < 1 then
+						T.scale = scale
+					else
+						T.scale = nil
 						e[1] = "done"
 					end
 				end
@@ -108,7 +131,9 @@ function StateMachine:transition(signal)
 				self.fx = FxQueue[1]
 				table.remove(FxQueue, 1)
 			else
-				self.state = "IDLE"
+				if not _grid:resolve() then
+					self.state = "IDLE"
+				end
 			end
 		end
 	-- Timer countdown signal

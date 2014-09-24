@@ -70,21 +70,26 @@ function Grid:draw()
 
 	love.graphics.push()
 	love.graphics.translate(self.offx, self.offy)
+	local size = Settings.tile_size
 	for pos,T in self:iterate() do
-		local x,y = unpack(pos)
-		local offx, offy = T.offx or 0, T.offy or 0
-		love.graphics.setColor(unpack(Colors[T.value]))
+		if T.value ~= 0 then
+			local x,y = unpack(pos)
+			local offx, offy = T.offx or 0, T.offy or 0
+			local scale = T.scale or 1
+			scale = (1 - scale)/2 or 0
+			love.graphics.setColor(unpack(Colors[T.value]))
 
-		love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx*Settings.tile_size, (y-1)*Settings.tile_size + offy*Settings.tile_size, Settings.tile_size, Settings.tile_size)
-		if self.selected and self.selected == T then
-			love.graphics.setColor(255,255,255,128)
-			
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4 + offx*Settings.tile_size, (y-1)*Settings.tile_size + 4 + offy*Settings.tile_size, Settings.tile_size - 8, Settings.tile_size - 8)
-		end
-		if matches[T] and T.value ~= 0 then
-			love.graphics.setColor(255,255,255,128)
+			love.graphics.rectangle("fill", (x-1)*size + offx*Settings.tile_size + scale*size, (y-1)*Settings.tile_size + offy*Settings.tile_size + scale*size, Settings.tile_size - 2*scale*size, Settings.tile_size - 2*scale*size)
+			if self.selected and self.selected == T then
+				love.graphics.setColor(255,255,255,128)
+				
+				love.graphics.rectangle("fill", (x-1)*Settings.tile_size + 4 + offx*Settings.tile_size, (y-1)*Settings.tile_size + 4 + offy*Settings.tile_size, Settings.tile_size - 8, Settings.tile_size - 8)
+			end
+			--[[if matches[T] and T.value ~= 0 then
+				love.graphics.setColor(255,255,255,128)
 
-			love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx*Settings.tile_size, (y-1)*Settings.tile_size + offy*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+				love.graphics.rectangle("fill", (x-1)*Settings.tile_size + offx*Settings.tile_size, (y-1)*Settings.tile_size + offy*Settings.tile_size, Settings.tile_size, Settings.tile_size)
+			end]]
 		end
 	end
 	love.graphics.pop()
@@ -148,10 +153,40 @@ end
 function Grid:resolve()
 	local change = false
 	local matches = self:checkMatch()
+	local FXMatch = {}
+	local FXFall = {}
+	local FXSpawn = {}
 	for T in pairs(matches) do
-		T.value = 0
+		table.insert(FXMatch, {"shrink", T})
+		table.insert(FXSpawn, {"spawn", T, math.random(#TileTypes)})
+		local height = 1
+		for i = 1,self.h-T.y do
+			if matches[self:getTile(T.x,T.y+i)] then
+				height = height + 1
+			else
+				break
+			end
+		end
+		local _T = self:getTile(T.x,T.y-1)
+		if _T and not matches[_T] then
+			local column = {}
+			for i = T.y-1,1,-1 do
+				table.insert(column, self:getTile(T.x,i))
+			end
+			for i = 1,height do
+				table.insert(FXFall, {"fall", column})
+			end
+		end
 		change = true
 	end
+	if #FXMatch > 0 then
+		table.insert(FxQueue, FXMatch)
+		if #FXFall > 0 then
+			table.insert(FxQueue, FXFall)
+		end
+		table.insert(FxQueue, FXSpawn)
+	end
+	
 
 	return change
 end
