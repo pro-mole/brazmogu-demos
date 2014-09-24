@@ -5,7 +5,7 @@ Settings = {
 	grid_height = 9,
 	tile_size = 32, -- Size to scale the tiles 
 	match_size = 3, -- Minimum size of matching sets
-	UIFx_speed = 1 -- Inverse speed factor of UI Effects (set 0 for no effects)
+	UIFx_speed = 2 -- Inverse speed factor of UI Effects (set 0 for no effects)
 }
 
 require("grid")
@@ -55,7 +55,7 @@ function love.mousepressed(x,y,button)
 				local S = _grid.selected
 				if S == T then
 					_grid.selected = nil
-				elseif (T.x == S.x and math.abs(T.y - S.y) == 1) or (T.y == S.y and math.abs(T.x - S.x)) then
+				elseif (T.x == S.x and math.abs(T.y - S.y) == 1) or (T.y == S.y and math.abs(T.x - S.x) == 1) then
 					table.insert(FxQueue, {{"swap", S, T}})
 					print(unpack(FxQueue))
 					StateMachine:transition("START")
