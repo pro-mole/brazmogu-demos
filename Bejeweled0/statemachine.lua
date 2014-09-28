@@ -19,83 +19,12 @@ function StateMachine:update(dt)
 		else
 			for i,e in ipairs(self.fx) do
 				print(unpack(e))
-				if e[1] == "swap" then
-					local _swap,T1,T2,noswapback,timer = unpack(e)
-					noswapback = noswapback or false
-					timer = timer or 0
-					local axis, off = "", ""
-					if T1.x == T2.x then
-						axis = "y"
-						off = "offy"
-					else
-						axis = "x"
-						off = "offx"
-					end
-					offset = math.abs(T1[off] or 0)
-					if speed > 0 then offset = offset + dt/speed else offset = 1 end
-					timer = timer + dt
-					if timer < speed then
-						if T1[axis] > T2[axis] then
-							T1[off] = -offset
-							T2[off] = offset
-						else
-							T1[off] = offset
-							T2[off] = -offset
-						end
-						e[4] = noswapback
-						e[5] = timer
-					else
-						_grid:swap(T1,T2)
-						local swapback = not _grid:resolve()
-						print(swapback)
-						if swapback and not noswapback then
-							table.insert(FxQueue, {{"swap",T1,T2,true}})
-						end
-						T1[off] = nil
-						T2[off] = nil
-						e[1] = "done";
-					end
-				elseif e[1] == "fall" then
-					local _slide,Tlist,timer = unpack(e)
-					timer = timer or 0
-					offset = Tlist[1].offy or 0
-					timer = timer + dt
-					if timer < speed then
-						for i,T in ipairs(Tlist) do
-							T.offy = offset + dt/speed
-						end
-						e[3] = timer
-					else
-						-- Assuming tiles in the list will be in order from lower to higher
-						local last = nil
-						for i,T in ipairs(Tlist) do
-							_grid:swap(T, _grid:getTile(T.x, T.y+1))
-							T.offy = nil
-						end
-						e[1] = "done"
-					end
-				elseif e[1] == "shrink" then
-					local _shrink,T = unpack(e)
-					local scale = T.scale or 1
-					if speed > 0 then scale = scale - dt/speed else scale = 0 end
-					if scale > 0 then
-						T.scale = scale
-					else
-						T.value = 0
-						T.scale = nil
-						e[1] = "done"
-					end
-				elseif e[1] == "spawn" then
-					local _spawn,T,val = unpack(e)
-					T.value = val
-					local scale = T.scale or 0
-					if speed > 0 then scale = scale + dt/speed else scale = 1 end
-					if scale < 1 then
-						T.scale = scale
-					else
-						T.scale = nil
-						e[1] = "done"
-					end
+				local f = e[1]
+				e[1] = dt
+				if FXEvents[f] then
+					self.fx[i] = FXEvents[f](unpack(e))
+				else
+					self.fx[i] = nil
 				end
 			end
 			
@@ -141,4 +70,92 @@ function StateMachine:transition(signal)
 	end
 	
 	print("STATE MACHINE POST-"..signal.." >> "..self.state)
+end
+
+-- FX Event callback functions
+FXEvents = {}
+function FXEvents.swap(dt,T1,T2,noswapback,timer)
+	local noswapback = noswapback or false
+	local timer = timer or 0
+	local speed = 1.0/Settings.UIFx_speed
+	local axis, off = "", ""
+	if T1.x == T2.x then
+		axis = "y"
+		off = "offy"
+	else
+		axis = "x"
+		off = "offx"
+	end
+	local offset = math.abs(T1[off] or 0)
+	if speed > 0 then offset = offset + dt/speed else offset = 1 end
+	timer = timer + dt
+	if timer < speed then
+		if T1[axis] > T2[axis] then
+			T1[off] = -offset
+			T2[off] = offset
+		else
+			T1[off] = offset
+			T2[off] = -offset
+		end
+		return {"swap",T1,T2,noswapback,timer}
+	else
+		_grid:swap(T1,T2)
+		local swapback = not _grid:resolve()
+		print(swapback)
+		if swapback and not noswapback then
+			table.insert(FxQueue, {{"swap",T1,T2,true}})
+		end
+		T1[off] = nil
+		T2[off] = nil
+		return nil
+	end
+end
+
+function FXEvents.fall(dt,Tlist,timer)
+	local timer = timer or 0
+	local speed = 1.0/Settings.UIFx_speed
+	local offset = Tlist[1].offy or 0
+	timer = timer + dt
+	if timer < speed then
+		for i,T in ipairs(Tlist) do
+			T.offy = offset + dt/speed
+		end
+		return {"fall",Tlist,timer}
+	else
+		-- Assuming tiles in the list will be in order from lower to higher
+		local last = nil
+		for i,T in ipairs(Tlist) do
+			_grid:swap(T, _grid:getTile(T.x, T.y+1))
+			T.offy = nil
+		end
+		return nil
+	end
+end
+
+function FXEvents.shrink(dt,T)
+	local scale = T.scale or 1
+	local speed = 1.0/Settings.UIFx_speed
+	if speed > 0 then scale = scale - dt/speed else scale = 0 end
+	if scale > 0 then
+		T.scale = scale
+		return {"shrink",T}
+	else
+		T.value = 0
+		T.scale = nil
+		return nil
+	end
+end
+
+function FXEvents.spawn(dt,T,val)
+	T.value = val
+	local speed = 1.0/Settings.UIFx_speed
+	local scale = T.scale or 0
+	if speed > 0 then scale = scale + dt/speed else scale = 1 end
+	if scale < 1 then
+		T.scale = scale
+		return {"spawn",T,val}
+	else
+		T.scale = nil
+		return nil
+	end
 end
