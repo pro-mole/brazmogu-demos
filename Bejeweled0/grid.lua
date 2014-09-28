@@ -14,6 +14,8 @@ function Tile.new(x,y,T)
 	return setmetatable({x=x, y=y, value=T}, Tile)
 end
 
+TileSprites = love.graphics.newImage("assets/sprite/jewels.png")
+
 TileTypes = {
 	"FIRE",
 	"EARTH",
@@ -23,6 +25,15 @@ TileTypes = {
 	"DARK"
 }
 
+Quads = {
+	love.graphics.newQuad(0,0,32,32,#TileTypes*32,32),
+	love.graphics.newQuad(32,0,32,32,#TileTypes*32,32),
+	love.graphics.newQuad(64,0,32,32,#TileTypes*32,32),
+	love.graphics.newQuad(96,0,32,32,#TileTypes*32,32),
+	love.graphics.newQuad(128,0,32,32,#TileTypes*32,32),
+	love.graphics.newQuad(160,0,32,32,#TileTypes*32,32)
+}
+
 Colors = {
 	[0] = {0,0,0,255},
 	[1] = {128,0,0,255},
@@ -30,7 +41,7 @@ Colors = {
 	[3] = {0,128,192,255},
 	[4] = {96,255,96,255},
 	[5] = {240,240,192,255},
-	[6] = {48,32,80,255},
+	[6] = {64,64,64,255},
 }
 
 Grid = {
@@ -83,7 +94,8 @@ function Grid:draw()
 			scale = (1 - scale)/2 or 0
 			love.graphics.setColor(unpack(Colors[T.value]))
 
-			love.graphics.rectangle("fill", (x-1)*size + offx*Settings.tile_size + scale*size, (y-1)*Settings.tile_size + offy*Settings.tile_size + scale*size, Settings.tile_size - 2*scale*size, Settings.tile_size - 2*scale*size)
+			love.graphics.draw(TileSprites, Quads[T.value],(x-1)*size + offx*Settings.tile_size + scale*size/2, (y-1)*Settings.tile_size + offy*Settings.tile_size + scale*size/2, 0, 1-scale, 1-scale)
+			-- love.graphics.rectangle("fill", (x-1)*size + offx*Settings.tile_size + scale*size, (y-1)*Settings.tile_size + offy*Settings.tile_size + scale*size, Settings.tile_size - 2*scale*size, Settings.tile_size - 2*scale*size)
 			if self.selected and self.selected == T then
 				love.graphics.setColor(255,255,255,128)
 				

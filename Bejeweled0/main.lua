@@ -41,7 +41,7 @@ end
 function love.keypressed(key, isrepeat)
 	if StateMachine.state == "IDLE" then
 		if key == "escape" then
-			love.quit()
+			love.event.quit()
 		end
 	end
 end
