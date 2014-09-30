@@ -47,6 +47,10 @@ function love.keypressed(key, isrepeat)
 		if key == "escape" then
 			love.event.quit()
 		end
+		
+		if key == "r" then
+			love.load()
+		end
 	end
 end
 
