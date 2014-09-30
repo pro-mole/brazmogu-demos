@@ -5,12 +5,15 @@ Settings = {
 	grid_height = 9,
 	tile_size = 32, -- Size to scale the tiles 
 	match_size = 3, -- Minimum size of matching sets
+	match_value = 100, -- Score value per gem in a match(for now)
 	UIFx_speed = 2 -- Inverse speed factor of UI Effects (set 0 for no effects)
 }
 
 require("grid")
 require("statemachine")
 _grid = nil
+score = 0
+multiplier = 0
 
 function love.load()
 	repeat
@@ -31,6 +34,7 @@ function love.load()
 			size = size + 1
 		end
 	until size == 0
+	score = 0
 end
 
 function love.update(dt)
@@ -73,10 +77,12 @@ end
 function love.draw()
 	_grid:draw()
 	
-	love.graphics.setColor(255,0,0,255)
-	love.graphics.print(StateMachine.state,2,2)
+	--[[love.graphics.setColor(255,0,0,255)
+	love.graphics.print(StateMachine.state,2,2)]]
 	
 	love.graphics.setColor(255,255,255,255)
+	
+	love.graphics.printf(string.format("%09d",score), love.window.getWidth() - 9*love.graphics.getFont():getWidth("0")-2, 2, 9)
 end
 
 function love.quit()

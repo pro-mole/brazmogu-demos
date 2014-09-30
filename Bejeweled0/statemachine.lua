@@ -159,3 +159,19 @@ function FXEvents.spawn(dt,T,val)
 		return nil
 	end
 end
+
+function FXEvents.score(dt,points,D)
+	local speed = 1.0/Settings.UIFx_speed
+	local D = D or 0
+	local delta = points * dt/speed
+	if delta > points - D then
+		delta = points - D
+	end
+	score = score + delta * multiplier
+	D = D + delta
+	if D >= points then
+		return nil
+	else
+		return {"score",points,D}
+	end
+end

@@ -174,6 +174,7 @@ function Grid:resolve()
 	local FXSpawn = {}
 	for T in pairs(matches) do
 		table.insert(FXMatch, {"shrink", T})
+		table.insert(FXFall, {"score", Settings.match_value})
 		table.insert(FXSpawn, {"spawn", T, math.random(#TileTypes)})
 		local height = 1
 		for i = 1,self.h-T.y do
@@ -197,13 +198,12 @@ function Grid:resolve()
 	end
 	if #FXMatch > 0 then
 		table.insert(FxQueue, FXMatch)
-		if #FXFall > 0 then
-			table.insert(FxQueue, FXFall)
-		end
+		table.insert(FxQueue, FXFall)
 		table.insert(FxQueue, FXSpawn)
 	end
 	
-
+	if change then multiplier = multiplier + 1
+	else multiplier = 0 end
 	return change
 end
 
