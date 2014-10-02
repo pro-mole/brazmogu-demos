@@ -2,7 +2,7 @@ function love.conf(t)
 	t.identity = nil -- Set this to have a proper save/data folder
 	t.version = "0.9.0"
 
-	t.window.title = "BRAZMOGU BEJEWELED DEMO"
+	t.window.title = "BRAZMOGU PACMAN"
 
 	t.window.width = 640
 	t.window.height = 480
