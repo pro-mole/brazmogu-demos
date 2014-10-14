@@ -33,7 +33,7 @@ function Maze.new(w,h,tile_layout)
 		table.insert(M.cells, {})
 		for x=1,w do
 			if tile_layout then
-				table.insert(M.cells[y], Cell.new("", tile_layout[y][x]))
+				table.insert(M.cells[y], Cell.new("", tonumber(tile_layout[y]:sub(x,x),16)))
 			else
 				table.insert(M.cells[y], Cell.new("", 0))
 			end
@@ -88,5 +88,58 @@ function Cell:isOpen(direction)
 end
 
 function Cell:draw()
-	love.graphics.rectangle("line",Maze.wall_thickness, Maze.wall_thickness, Maze.tile_size-Maze.wall_thickness*2, Maze.tile_size-Maze.wall_thickness*2)
+	local h = Maze.tile_size
+	local w = Maze.tile_size
+	local t = Maze.wall_thickness
+
+	if self.openings.up and self.openings.down and self.openings.left and self.openings.right then
+		love.graphics.line(t,0, t,t, 0,t)
+		love.graphics.line(w-t,0, w-t,t, w,t)
+		love.graphics.line(t,h, t,h-t, 0,h-t)
+		love.graphics.line(w-t,h, w-t,h-t, w,h-t)
+	elseif not self.openings.up and self.openings.down and not self.openings.left and self.openings.right then
+		love.graphics.line(t,h, t,t, w,t)
+		love.graphics.line(w-t,h, w-t,h-t, w,h-t)
+	elseif not self.openings.up and self.openings.down and self.openings.left and not self.openings.right then
+		love.graphics.line(0,t, w-t,t, w-t,h)
+		love.graphics.line(t,h, t,h-t, 0,h-t)
+	elseif self.openings.up and not self.openings.down and not self.openings.left and self.openings.right then
+		love.graphics.line(t,0, t,h-t, w,h-t)
+		love.graphics.line(w-t,0, w-t,t, w,t)
+	elseif self.openings.up and not self.openings.down and self.openings.left and not self.openings.right then
+		love.graphics.line(w-t,0, w-t,h-t, 0,h-t)
+		love.graphics.line(t,0, t,t, 0,t)
+	elseif not self.openings.up and not self.openings.down and self.openings.left and self.openings.right then
+		love.graphics.line(0,t, w,t)
+		love.graphics.line(0,h-t, w,h-t)
+	elseif self.openings.up and self.openings.down and not self.openings.left and not self.openings.right then
+		love.graphics.line(t,0, t,h)
+		love.graphics.line(w-t,0, w-t,h)
+	elseif not self.openings.up and self.openings.down and self.openings.left and self.openings.right then
+		love.graphics.line(0,t, w,t)
+		love.graphics.line(t,h, t,h-t, 0,h-t)
+		love.graphics.line(w-t,h, w-t,h-t, w,h-t)
+	elseif self.openings.up and not self.openings.down and self.openings.left and self.openings.right then
+		love.graphics.line(0,h-t, w,h-t)
+		love.graphics.line(t,0, t,t, 0,t)
+		love.graphics.line(w-t,0, w-t,t, w,t)
+	elseif self.openings.up and self.openings.down and not self.openings.left and self.openings.right then
+		love.graphics.line(t,0, t,h)
+		love.graphics.line(w-t,0, w-t,t, w,t)
+		love.graphics.line(w-t,h, w-t,h-t, w,h-t)
+	elseif self.openings.up and self.openings.down and self.openings.left and not self.openings.right then
+		love.graphics.line(w-t,0, w-t,h)
+		love.graphics.line(t,0, t,t, 0,t)
+		love.graphics.line(t,h, t,h-t, 0,h-t)
+	elseif self.openings.up and not self.openings.down and not self.openings.left and not self.openings.right then
+		love.graphics.line(t,0, t,t, t,h-t, w-t,h-t, w-t,0)
+	elseif not self.openings.up and self.openings.down and not self.openings.left and not self.openings.right then
+		love.graphics.line(t,h, t,t, w-t,t, w-t,h)
+	elseif not self.openings.up and not self.openings.down and self.openings.left and not self.openings.right then
+		love.graphics.line(0,t, w-t,t, w-t,h-t, 0,h-t)
+	elseif not self.openings.up and not self.openings.down and not self.openings.left and self.openings.right then
+		love.graphics.line(w,t, t,t, t,h-t, w,h-t)
+	-- else
+	end
+	-- love.graphics.rectangle("line",Maze.wall_thickness, Maze.wall_thickness, Maze.tile_size-Maze.wall_thickness*2, Maze.tile_size-Maze.wall_thickness*2)
 end
