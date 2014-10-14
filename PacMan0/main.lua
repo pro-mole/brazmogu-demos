@@ -1,4 +1,5 @@
 require("maze")
+require("mazeobject")
 
 _maze = nil
 
@@ -15,7 +16,14 @@ function love.load()
 		 "9DDDFDDD5"})
 end
 
+function love.keypressed(key, isrepeat)
+	if key == "escape" then
+		love.event.quit()
+	end
+end
+
 function love.update(dt)
+	_maze:update(dt)
 end
 
 function love.draw()
